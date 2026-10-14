@@ -1,0 +1,76 @@
+:root {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #1c2230;
+  --muted: #667085;
+  --border: #e4e7ec;
+  --accent: #3858e9;
+  --accent-soft: #eef1fd;
+  --view: #12805c;
+  --click: #c4320a;
+  --row-hover: #f8f9fb;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #11141a;
+    --panel: #191d25;
+    --text: #e6e8ec;
+    --muted: #98a2b3;
+    --border: #2a303b;
+    --accent: #7b93ff;
+    --accent-soft: #232a40;
+    --view: #4cc394;
+    --click: #ff8a5c;
+    --row-hover: #1f242e;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+h1 { font-size: 18px; margin: 0; }
+h2 { font-size: 15px; margin: 0 0 12px; }
+.muted { color: var(--muted); }
+.error { color: var(--click); }
+.mono { font-family: ui-monospace, 'Cascadia Code', Menlo, monospace; font-size: 12.5px; }
+
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding: 12px 24px; background: var(--panel); border-bottom: 1px solid var(--border); }
+.top nav { display: flex; gap: 4px; }
+.top .actions { margin-left: auto; display: flex; gap: 8px; }
+button, .ghost { font: inherit; color: var(--text); background: none; border: 1px solid transparent; border-radius: 6px; padding: 6px 12px; cursor: pointer; text-decoration: none; }
+nav button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.ghost { border-color: var(--border); }
+button:hover, .ghost:hover { border-color: var(--accent); }
+button:focus-visible, a:focus-visible, tr:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+main { padding: 20px 24px; }
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 16px; min-width: 0; }
+.split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 900px) { .split { grid-template-columns: 1fr; } main { padding: 16px; } .top { padding: 12px 16px; } }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { color: var(--muted); font-weight: 500; font-size: 12px; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: var(--row-hover); }
+tr.selected { background: var(--accent-soft); }
+.panel:has(table) { overflow-x: auto; }
+
+.journey { list-style: none; margin: 0; padding: 0; }
+.journey li { display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.offset { color: var(--muted); min-width: 44px; }
+.badge { font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 99px; white-space: nowrap; }
+.badge.page_view { color: var(--view); background: color-mix(in srgb, var(--view) 14%, transparent); }
+.badge.click { color: var(--click); background: color-mix(in srgb, var(--click) 14%, transparent); }
+.detail { overflow-wrap: anywhere; }
+
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 16px; }
+.toolbar h2 { margin: 0; }
+select { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; max-width: 100%; }
+.heat-box { position: relative; overflow: hidden; border-radius: 6px; background: repeating-linear-gradient(0deg, transparent 0 49px, var(--border) 49px 50px), repeating-linear-gradient(90deg, transparent 0 49px, var(--border) 49px 50px); }
+.stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.stage iframe { border: 0; display: block; pointer-events: none; background: #fff; }
+.dot { position: absolute; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(239, 35, 60, 0.75) 0%, rgba(239, 35, 60, 0.35) 45%, rgba(239, 35, 60, 0) 72%); }

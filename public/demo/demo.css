@@ -1,0 +1,19 @@
+* { box-sizing: border-box; }
+body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #1f2328; background: #fafaf7; }
+header { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: #1f2328; color: #fff; }
+header a { color: #fff; text-decoration: none; margin-left: 20px; }
+.logo { font-weight: 700; font-size: 20px; margin: 0; }
+main { max-width: 1000px; margin: 0 auto; padding: 32px; }
+.hero { padding: 48px 32px; border-radius: 12px; background: #e8efe6; margin-bottom: 32px; }
+.hero h1 { margin: 0 0 8px; font-size: 36px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+.card { background: #fff; border: 1px solid #e3e3dc; border-radius: 10px; padding: 16px; }
+.swatch { height: 140px; border-radius: 8px; margin-bottom: 12px; }
+.card h3 { margin: 0 0 4px; }
+.price { font-weight: 700; }
+button, .btn { display: inline-block; padding: 10px 18px; border: 0; border-radius: 8px; background: #2d6a4f; color: #fff; font: inherit; cursor: pointer; text-decoration: none; }
+button.secondary { background: #e3e3dc; color: #1f2328; }
+.product { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.product .swatch { height: 360px; }
+.sizes { display: flex; gap: 8px; margin: 16px 0; }
+footer { text-align: center; color: #6e7781; padding: 32px; }
