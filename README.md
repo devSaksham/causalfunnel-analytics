@@ -18,7 +18,7 @@ A small full-stack analytics app. An embeddable script records page views and cl
 
 ## Setup
 
-Requires Node 20.6+ (tested on Node 24).
+Requires Node 22.12+ (tested on Node 24).
 
 ```bash
 npm install
@@ -36,8 +36,9 @@ Then open http://localhost:3000/demo/index.html, click around, and watch http://
 ### Deploying to Netlify
 
 ```bash
-netlify deploy --prod                 # builds via netlify.toml
-netlify env:set MONGODB_URI "<atlas connection string>"
+netlify sites:create --name <site-name>                # or `netlify link` for an existing site
+netlify env:set MONGODB_URI "<atlas connection string>" # must be set before deploying
+netlify deploy --prod                                   # builds via netlify.toml
 ```
 
 Atlas *Network Access* must allow `0.0.0.0/0`, because Netlify functions have no fixed IPs.
