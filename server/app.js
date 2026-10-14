@@ -135,8 +135,7 @@ api.get('/heatmap', async (req, res) => {
   res.json(clicks);
 });
 
-// Netlify may hand the function either the original path or its internal one.
-app.use(['/api', '/.netlify/functions/api'], api);
+app.use('/api', api);
 
 app.use((err, req, res, next) => {
   const status = err.status || err.statusCode || 500;
