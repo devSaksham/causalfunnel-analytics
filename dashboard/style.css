@@ -69,6 +69,10 @@ tr.selected { background: var(--accent-soft); }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 16px; }
 .toolbar h2 { margin: 0; }
 select { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; max-width: 100%; }
+.segmented { display: flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.segmented button { border-radius: 0; text-transform: capitalize; }
+.segmented button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.segmented button:disabled { color: var(--muted); cursor: default; border-color: transparent; }
 .heat-box { position: relative; overflow: hidden; border-radius: 6px; background: repeating-linear-gradient(0deg, transparent 0 49px, var(--border) 49px 50px), repeating-linear-gradient(90deg, transparent 0 49px, var(--border) 49px 50px); }
 .stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
 .stage iframe { border: 0; display: block; pointer-events: none; background: #fff; }

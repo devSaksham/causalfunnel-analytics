@@ -28,7 +28,7 @@ const fmtTime = (t) => new Date(t).toLocaleString();
 const shortPath = (url) => {
   try {
     const u = new URL(url);
-    return u.pathname + u.search + u.hash;
+    return (u.origin === location.origin ? '' : u.host) + u.pathname + u.search + u.hash;
   } catch {
     return url;
   }
@@ -115,6 +115,14 @@ function useWidth(ref) {
 
 const median = (xs) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 
+// Responsive pages lay out differently per device, so clicks are only comparable within a width class.
+const DEVICES = [
+  ['desktop', 1024, Infinity],
+  ['tablet', 768, 1024],
+  ['mobile', 0, 768],
+];
+const deviceOf = (w) => DEVICES.find(([, min, max]) => w >= min && w < max)[0];
+
 function Heatmap({ reload }) {
   const pages = useApi('/pages', reload);
   const [page, setPage] = useState('');
@@ -123,9 +131,13 @@ function Heatmap({ reload }) {
   const boxRef = useRef(null);
   const boxWidth = useWidth(boxRef);
   const [frameHeight, setFrameHeight] = useState(null);
+  const [pickedDevice, setDevice] = useState(null);
 
-  const points = clicks.data || [];
-  // Render the page at the most common width it was clicked at, and map every click onto it.
+  const all = clicks.data || [];
+  const counts = Object.fromEntries(DEVICES.map(([d]) => [d, all.filter((c) => deviceOf(c.page_width) === d).length]));
+  const device = counts[pickedDevice] ? pickedDevice : DEVICES.map(([d]) => d).find((d) => counts[d] === Math.max(...Object.values(counts)));
+  const points = all.filter((c) => deviceOf(c.page_width) === device);
+  // Render the page at the typical width for this device class and map each click onto it.
   const W = points.length ? median(points.map((c) => c.page_width)) : 1280;
   const H = Math.max(frameHeight || 0, ...points.map((c) => c.y + 40), 600);
   const scale = boxWidth ? Math.min(1, boxWidth / W) : 1;
@@ -150,7 +162,16 @@ function Heatmap({ reload }) {
             ))}
           </select>
         </label>
-        {clicks.data && <span className="muted">{points.length} clicks, rendered at {W}px wide</span>}
+        {all.length > 0 && (
+          <div className="segmented" role="group" aria-label="Device">
+            {DEVICES.map(([d]) => (
+              <button key={d} className={d === device ? 'active' : ''} disabled={!counts[d]} onClick={() => setDevice(d)}>
+                {d} ({counts[d]})
+              </button>
+            ))}
+          </div>
+        )}
+        {clicks.data && <span className="muted">{points.length} clicks, page rendered at {W}px wide</span>}
       </div>
       <Status state={pages} empty="No pages tracked yet." />
       <div ref={boxRef} className="heat-box" style={{ height: current ? H * scale : 0 }}>
