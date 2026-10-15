@@ -54,6 +54,7 @@ test('rejects malformed events', async () => {
   for (const bad of [
     ev('scroll', 1),
     ev('click', 1), // missing coordinates
+    ev('click', 1, { x: 1, y: 1, page_width: 0 }), // zero-size viewport
     { ...ev('page_view', 1), url: 'not a url' },
     { ...ev('page_view', 1), timestamp: 'nope' },
     { ...ev('page_view', 1), session_id: '' },

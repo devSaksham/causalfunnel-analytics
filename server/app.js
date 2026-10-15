@@ -57,7 +57,8 @@ export function parseEvent(e) {
     received_at: new Date(),
   };
   if (e.type === 'click') {
-    if (!num(e.x) || !num(e.y) || !num(e.page_width)) return null;
+    // page_width 0 comes from hidden or zero-size viewports; it would divide by zero in the heatmap.
+    if (!num(e.x) || !num(e.y) || !num(e.page_width) || e.page_width === 0) return null;
     doc.x = Math.round(e.x);
     doc.y = Math.round(e.y);
     doc.page_width = Math.round(e.page_width);
