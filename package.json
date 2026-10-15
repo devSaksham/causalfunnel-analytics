@@ -7,7 +7,7 @@
     "dev:dashboard": "vite",
     "build": "vite build",
     "start": "node --env-file-if-exists=.env server/index.js",
-    "test": "node --test --test-force-exit"
+    "test": "node --env-file-if-exists=.env --test --test-force-exit"
   },
   "type": "module",
   "dependencies": {
@@ -18,7 +18,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.2",
-    "mongodb-memory-server": "^11.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "vite": "^8.3.4"

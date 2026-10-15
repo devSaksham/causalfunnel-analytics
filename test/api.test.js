@@ -1,18 +1,21 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { app, connect, pageKey } from '../server/app.js';
 
-let mongo, server, base;
+// Runs against MongoDB Atlas (MONGODB_URI from .env) in a throwaway database per run, so the real
+// `analytics` database is never touched. Its collections are dropped afterwards, which removes the database.
+const TEST_DB = `analytics_test_${Date.now()}`;
+let db, server, base;
 before(async () => {
-  mongo = await MongoMemoryServer.create();
-  await connect(mongo.getUri());
+  if (!process.env.MONGODB_URI) throw new Error('Set MONGODB_URI in .env to run the tests');
+  process.env.MONGODB_DB = TEST_DB;
+  db = await connect();
   server = app.listen(0);
   base = `http://localhost:${server.address().port}/api`;
 });
 after(async () => {
   server.close();
-  await mongo.stop();
+  if (db?.databaseName === TEST_DB) for (const c of await db.collections()) await c.drop();
 });
 
 // Sent as text/plain, exactly like navigator.sendBeacon does.

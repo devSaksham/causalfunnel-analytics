@@ -4,4 +4,3 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  MONGOMS_DISABLE_POSTINSTALL = "1" # in-memory MongoDB is for local dev/tests only

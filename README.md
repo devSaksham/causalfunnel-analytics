@@ -11,14 +11,18 @@ A small full-stack analytics app. An embeddable script records page views and cl
 |---|---|
 | Tracker | Vanilla JS (`public/tracker.js`), no dependencies |
 | Backend | Node.js + Express 5 (`server/app.js`) |
-| Database | MongoDB (Atlas in production, an in-memory MongoDB locally) |
+| Database | MongoDB Atlas |
 | Dashboard | React 19 + Vite (`dashboard/`) |
 | Hosting | Netlify: static dashboard/tracker/demo, with the Express app running as a Netlify Function |
-| Tests | `node:test` + `mongodb-memory-server` |
+| Tests | `node:test` against Atlas, in a throwaway database per run |
 
 ## Setup
 
-Requires Node 22.12+ (tested on Node 24).
+Requires Node 22.12+ (tested on Node 24) and a MongoDB Atlas cluster (the free M0 tier is enough).
+
+1. In Atlas, create a cluster and a database user, and allow your IP under *Network Access* (`0.0.0.0/0` for Netlify).
+2. Copy `.env.example` to `.env` and paste the connection string into `MONGODB_URI`.
+3. Then:
 
 ```bash
 npm install
@@ -26,12 +30,12 @@ npm run build   # builds the dashboard into dist/ (also copies tracker.js and th
 npm start       # http://localhost:3000
 ```
 
-With no `MONGODB_URI`, the server starts a throwaway in-memory MongoDB, so it runs with zero setup (the first run downloads a mongod binary). To use a real database, copy `.env.example` to `.env` and set `MONGODB_URI`.
+Data goes to the `analytics` database (override with `MONGODB_DB`). The server exits with an error if `MONGODB_URI` is not set.
 
 Then open http://localhost:3000/demo/index.html, click around, and watch http://localhost:3000.
 
 - **Dashboard hot reload:** run `npm run dev` (API on :3000) and `npm run dev:dashboard` (Vite on :5173, which proxies `/api`).
-- **Tests:** `npm test`
+- **Tests:** `npm test`. They use the same `MONGODB_URI`, but write to a throwaway `analytics_test_<timestamp>` database that is dropped when the run ends, so real data is never touched.
 
 ### Deploying to Netlify
 
