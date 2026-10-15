@@ -51,6 +51,7 @@ Atlas *Network Access* must allow `0.0.0.0/0`, because Netlify functions have no
 
 Events are posted to `/api/events` on the host serving the script. Override this with `data-endpoint="https://.../api/events"`.
 
+- **Single-page apps:** client-side route changes (`history.pushState`/`replaceState`/back) are recorded as page views when the path changes. Query-string-only changes are ignored, so search boxes do not spam views.
 - **Opt-out zones:** clicks inside any element marked `data-cf-ignore` are not tracked.
 - **Observing events:** every event sent is also dispatched on `window` as a `cf:event` CustomEvent, which is handy for debug panels.
 - **Privacy:** a clicked element is described by its tag, id and visible text. Form fields are described by their label or placeholder only, never by what the user typed.
@@ -114,6 +115,5 @@ Sessions are computed with an aggregation rather than stored separately. This ke
   - authentication on the dashboard/API
   - rate limiting or bot filtering on ingest
   - pagination (sessions are capped at the 500 most recent, heatmap points at 10,000)
-  - SPA route-change tracking (`pushState`)
   - data retention policy
 - **Serverless:** the Mongo client is cached at module scope so warm function invocations reuse one connection pool. Indexes are created on first connect.

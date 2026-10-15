@@ -4,6 +4,7 @@
  * Events go to /api/events on the host serving this script, unless overridden
  * with data-endpoint="https://.../api/events".
  * Clicks inside elements marked data-cf-ignore are not tracked.
+ * Client-side route changes (history.pushState/replaceState/back) are recorded as page views.
  * Every event sent is also dispatched on window as a `cf:event` CustomEvent.
  */
 (function () {
@@ -60,6 +61,24 @@
   }
 
   send('page_view');
+
+  // Single-page apps change the URL without a reload: count a new path as a page view.
+  // Only the path matters, so query-string updates (search boxes, filters) don't spam views.
+  var lastPath = location.pathname;
+  function onRoute() {
+    if (location.pathname === lastPath) return;
+    lastPath = location.pathname;
+    send('page_view');
+  }
+  ['pushState', 'replaceState'].forEach(function (method) {
+    var original = history[method];
+    history[method] = function () {
+      var result = original.apply(this, arguments);
+      onRoute();
+      return result;
+    };
+  });
+  window.addEventListener('popstate', onRoute);
 
   document.addEventListener(
     'click',
