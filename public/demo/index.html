@@ -4,27 +4,102 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fern & Co. (demo store)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap">
   <link rel="stylesheet" href="demo.css">
   <script src="/tracker.js" defer></script>
 </head>
-<body>
-  <header>
-    <p class="logo">Fern &amp; Co.</p>
-    <nav><a href="index.html">Shop</a><a href="product.html">Featured</a><a href="#" id="cart-link">Cart</a></nav>
-  </header>
-  <main>
-    <section class="hero">
-      <h1>Autumn essentials</h1>
-      <p>Demo store. Every page view and click here is tracked and shows up in the dashboard.</p>
-      <a class="btn" id="shop-now" href="product.html">Shop the collection</a>
-    </section>
-    <div class="grid">
-      <div class="card"><div class="swatch" style="background:#b5838d"></div><h3>Wool scarf</h3><p class="price">$39</p><a class="btn" href="product.html">View</a></div>
-      <div class="card"><div class="swatch" style="background:#6d6875"></div><h3>Canvas tote</h3><p class="price">$29</p><a class="btn" href="product.html">View</a></div>
-      <div class="card"><div class="swatch" style="background:#e5989b"></div><h3>Knit beanie</h3><p class="price">$24</p><a class="btn" href="product.html">View</a></div>
-      <div class="card"><div class="swatch" style="background:#588157"></div><h3>Rain jacket</h3><p class="price">$119</p><a class="btn" href="product.html">View</a></div>
+<body data-page="home">
+  <div class="announce">Free shipping on orders over $50 · Use code <b>FERN20</b> for 20% off <button data-dismiss aria-label="Dismiss announcement">×</button></div>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="logo" href="index.html">Fern &amp; Co.</a>
+      <nav class="nav" aria-label="Main"><a href="index.html#shop" aria-current="page">Shop</a><a href="product.html?id=jacket">Featured</a><a href="index.html#faq">Help</a></nav>
+      <form class="search" role="search"><input type="search" placeholder="Search products" aria-label="Search products"></form>
+      <a class="cart-link" href="cart.html" id="cart-link">Cart <span class="badge" data-cart-count>0</span></a>
     </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <h1>Made for slow autumn days.</h1>
+        <p>Every click on this page is tracked. Browse, filter, add to cart and check out, then watch your journey and heatmap in the dashboard.</p>
+        <div class="hero-actions">
+          <a class="btn" id="shop-now" href="#shop">Shop new arrivals</a>
+          <a class="btn ghost" id="featured" href="product.html?id=jacket">See the rain jacket</a>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <span style="background:#a3b18a"></span><span style="background:#ddb892"></span><span style="background:#e5989b"></span><span style="background:#f7f4ee"></span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h2>Shop by category</h2></div>
+      <div class="cats">
+        <a class="cat" href="#shop" style="background:#b5838d">Accessories</a>
+        <a class="cat" href="#shop" style="background:#588157">Outerwear</a>
+        <a class="cat" href="#shop" style="background:#7f5539">Home</a>
+        <a class="cat" href="#shop" style="background:#3a5a40">Stationery</a>
+      </div>
+    </section>
+
+    <section class="section" id="shop">
+      <div class="section-head">
+        <h2>New arrivals</h2>
+        <div class="chips" role="group" aria-label="Filter products">
+          <button class="chip" data-filter="all" aria-pressed="true">All</button>
+          <button class="chip" data-filter="Accessories" aria-pressed="false">Accessories</button>
+          <button class="chip" data-filter="Outerwear" aria-pressed="false">Outerwear</button>
+          <button class="chip" data-filter="Home" aria-pressed="false">Home</button>
+          <button class="chip" data-filter="Stationery" aria-pressed="false">Stationery</button>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card" data-cat="Accessories"><a href="product.html?id=scarf"><div class="swatch" style="--c:#b5838d"></div><h3>Wool scarf</h3></a><span class="muted">Accessories</span><div class="card-foot"><span class="price">$39</span><button class="btn small" data-add="scarf">Quick add</button></div></article>
+        <article class="card" data-cat="Accessories"><a href="product.html?id=tote"><div class="swatch" style="--c:#6d6875"></div><h3>Canvas tote</h3></a><span class="muted">Accessories</span><div class="card-foot"><span class="price">$29</span><button class="btn small" data-add="tote">Quick add</button></div></article>
+        <article class="card" data-cat="Accessories"><a href="product.html?id=beanie"><div class="swatch" style="--c:#e5989b"></div><h3>Knit beanie</h3></a><span class="muted">Accessories</span><div class="card-foot"><span class="price">$24</span><button class="btn small" data-add="beanie">Quick add</button></div></article>
+        <article class="card" data-cat="Outerwear"><a href="product.html?id=jacket"><div class="swatch" style="--c:#588157"></div><h3>Rain jacket</h3></a><span class="muted">Outerwear</span><div class="card-foot"><span class="price">$119</span><button class="btn small" data-add="jacket">Quick add</button></div></article>
+        <article class="card" data-cat="Outerwear"><a href="product.html?id=vest"><div class="swatch" style="--c:#a3b18a"></div><h3>Quilted vest</h3></a><span class="muted">Outerwear</span><div class="card-foot"><span class="price">$89</span><button class="btn small" data-add="vest">Quick add</button></div></article>
+        <article class="card" data-cat="Home"><a href="product.html?id=mug"><div class="swatch" style="--c:#ddb892"></div><h3>Stoneware mug</h3></a><span class="muted">Home</span><div class="card-foot"><span class="price">$18</span><button class="btn small" data-add="mug">Quick add</button></div></article>
+        <article class="card" data-cat="Home"><a href="product.html?id=candle"><div class="swatch" style="--c:#7f5539"></div><h3>Cedar candle</h3></a><span class="muted">Home</span><div class="card-foot"><span class="price">$32</span><button class="btn small" data-add="candle">Quick add</button></div></article>
+        <article class="card" data-cat="Stationery"><a href="product.html?id=notebook"><div class="swatch" style="--c:#3a5a40"></div><h3>Linen notebook</h3></a><span class="muted">Stationery</span><div class="card-foot"><span class="price">$16</span><button class="btn small" data-add="notebook">Quick add</button></div></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="promo">
+        <div><h2>20% off everything this week</h2><p class="muted">Apply the code in your cart.</p></div>
+        <div class="hero-actions" style="margin:0"><span class="code">FERN20</span><button class="btn" id="copy-code">Copy code</button></div>
+      </div>
+    </section>
+
+    <section class="section faq" id="faq">
+      <div class="section-head"><h2>Questions</h2></div>
+      <details><summary>Is anything here actually for sale?</summary><p>No. This is a demo store used to generate realistic analytics data.</p></details>
+      <details><summary>What gets tracked?</summary><p>Page views and clicks, with the click position and the element clicked. The test console in the corner shows each event as it is sent.</p></details>
+      <details><summary>How do I start a fresh session?</summary><p>Open the test console and press "New session". Sessions also expire after 30 minutes of inactivity.</p></details>
+      <details><summary>Where do I see the data?</summary><p>Open the dashboard from the footer, or use "View in dashboard" in the test console to jump straight to your own journey.</p></details>
+    </section>
+
+    <section class="section">
+      <div class="newsletter">
+        <h2>Letters from the workshop, once a month.</h2>
+        <form id="newsletter"><input type="email" required placeholder="you@example.com" aria-label="Email address"><button class="btn">Subscribe</button></form>
+      </div>
+    </section>
   </main>
-  <footer>Demo page for the analytics assignment</footer>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div><a class="logo" href="index.html">Fern &amp; Co.</a><p class="muted">A demo store for testing session tracking. Nothing here is for sale.</p></div>
+      <div><h4>Shop</h4><a href="index.html#shop">All products</a><a href="product.html?id=jacket">Rain jacket</a><a href="product.html?id=candle">Cedar candle</a></div>
+      <div><h4>Help</h4><a href="index.html#faq">FAQ</a><a href="cart.html">Your cart</a><a href="checkout.html">Checkout</a></div>
+      <div><h4>Testing</h4><a href="/">Open dashboard</a><a href="/tracker.js">tracker.js</a></div>
+    </div>
+  </footer>
+  <script src="demo.js"></script>
 </body>
 </html>

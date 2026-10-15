@@ -51,6 +51,23 @@ Atlas *Network Access* must allow `0.0.0.0/0`, because Netlify functions have no
 
 Events are posted to `/api/events` on the host serving the script. Override this with `data-endpoint="https://.../api/events"`.
 
+- **Opt-out zones:** clicks inside any element marked `data-cf-ignore` are not tracked.
+- **Observing events:** every event sent is also dispatched on `window` as a `cf:event` CustomEvent, which is handy for debug panels.
+- **Privacy:** a clicked element is described by its tag, id and visible text. Form fields are described by their label or placeholder only, never by what the user typed.
+
+## Demo store
+
+`/demo/` is a small four-page shop (home → product → cart → checkout) built to generate realistic journeys. It has:
+
+- category filters, quick-add buttons and a promo code (`FERN20`)
+- a product page driven by `?id=` with sizes, a quantity stepper, gallery thumbnails, tabs and a wishlist
+- a deliberate friction point: "Add to cart" without picking a size shows an error, which is good for spotting repeated clicks
+- a cart with steppers and a promo field, and a fake checkout form that sends nothing anywhere
+
+A **test console** in the corner shows your session ID and each event as it is sent. "View in dashboard" opens `/?session=<id>` straight to your journey, and "New session" starts a fresh one. The console itself is marked `data-cf-ignore`, so clicks on it are not tracked.
+
+Page layout lives in static HTML, because the heatmap preview renders pages without running their scripts. For the same reason the header is not sticky.
+
 ## API
 
 | Method | Path | Description |

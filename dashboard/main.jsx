@@ -184,7 +184,7 @@ function EngagementCard({ sessions }) {
 function Overview({ reload }) {
   const sessions = useApi('/sessions', reload);
   const pages = useApi('/pages', reload);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(() => new URLSearchParams(location.search).get('session')); // deep link from the demo's test console
   const journey = useApi(selected && `/sessions/${encodeURIComponent(selected)}/events`, reload);
   const list = sessions.data || [];
 

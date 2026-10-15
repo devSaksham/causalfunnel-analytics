@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your cart | Fern & Co. (demo)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&display=swap">
+  <link rel="stylesheet" href="demo.css">
+  <script src="/tracker.js" defer></script>
+</head>
+<body data-page="cart">
+  <div class="announce">Free shipping on orders over $50 · Use code <b>FERN20</b> for 20% off <button data-dismiss aria-label="Dismiss announcement">×</button></div>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="logo" href="index.html">Fern &amp; Co.</a>
+      <nav class="nav" aria-label="Main"><a href="index.html#shop">Shop</a><a href="product.html?id=jacket">Featured</a><a href="index.html#faq">Help</a></nav>
+      <form class="search" role="search"><input type="search" placeholder="Search products" aria-label="Search products"></form>
+      <a class="cart-link" href="cart.html" id="cart-link" aria-current="page">Cart <span class="badge" data-cart-count>0</span></a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1 class="page-title">Your cart</h1>
+    <div class="two-col">
+      <div class="box" id="cart-lines"><div class="empty"><p class="muted">Your cart is empty.</p></div></div>
+      <aside class="box">
+        <h3>Order summary</h3>
+        <form class="promo-form" id="promo-form"><input id="promo" placeholder="Promo code" aria-label="Promo code"><button class="btn ghost small">Apply</button></form>
+        <div id="summary"></div>
+        <button class="btn green block" id="checkout" style="margin-top:16px">Checkout</button>
+        <a class="btn ghost block" href="index.html#shop" style="margin-top:8px">Continue shopping</a>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div><a class="logo" href="index.html">Fern &amp; Co.</a><p class="muted">A demo store for testing session tracking. Nothing here is for sale.</p></div>
+      <div><h4>Shop</h4><a href="index.html#shop">All products</a><a href="product.html?id=jacket">Rain jacket</a><a href="product.html?id=candle">Cedar candle</a></div>
+      <div><h4>Help</h4><a href="index.html#faq">FAQ</a><a href="cart.html">Your cart</a><a href="checkout.html">Checkout</a></div>
+      <div><h4>Testing</h4><a href="/">Open dashboard</a><a href="/tracker.js">tracker.js</a></div>
+    </div>
+  </footer>
+  <script src="demo.js"></script>
+</body>
+</html>

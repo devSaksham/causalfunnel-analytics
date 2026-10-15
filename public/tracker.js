@@ -3,6 +3,8 @@
  *   <script src="https://<your-host>/tracker.js" defer></script>
  * Events go to /api/events on the host serving this script, unless overridden
  * with data-endpoint="https://.../api/events".
+ * Clicks inside elements marked data-cf-ignore are not tracked.
+ * Every event sent is also dispatched on window as a `cf:event` CustomEvent.
  */
 (function () {
   var script = document.currentScript;
@@ -41,12 +43,19 @@
     if (!(navigator.sendBeacon && navigator.sendBeacon(endpoint, body))) {
       fetch(endpoint, { method: 'POST', body: body, keepalive: true }).catch(function () {});
     }
+    // Lets the host page observe what was sent (e.g. a debug panel).
+    window.dispatchEvent(new CustomEvent('cf:event', { detail: event }));
   }
 
   function describe(el) {
     if (!el || !el.tagName) return undefined;
     var label = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '');
-    var text = (el.innerText || el.value || el.alt || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+    // Never read what the user typed: form fields are named by their label/placeholder, not their value.
+    var isField = /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && !/^(submit|button|reset)$/.test(el.type);
+    var text = isField
+      ? (el.labels && el.labels[0] && el.labels[0].innerText) || el.getAttribute('aria-label') || el.placeholder || el.name || ''
+      : el.getAttribute('aria-label') || el.innerText || el.value || el.alt || '';
+    text = text.trim().replace(/\s+/g, ' ').slice(0, 40);
     return text ? label + ' "' + text + '"' : label;
   }
 
@@ -55,13 +64,14 @@
   document.addEventListener(
     'click',
     function (e) {
+      if (e.target.closest && e.target.closest('[data-cf-ignore]')) return; // opt-out zones
       var root = document.documentElement;
       send('click', {
         x: e.pageX,
         y: e.pageY,
         page_width: Math.max(root.scrollWidth, root.clientWidth),
         viewport_width: window.innerWidth,
-        target: describe(e.target.closest ? e.target.closest('a,button,input,select,textarea,[id]') || e.target : e.target),
+        target: describe(e.target.closest ? e.target.closest('a,button,input,select,textarea,summary,label,[role=button],[id]') || e.target : e.target),
       });
     },
     true
