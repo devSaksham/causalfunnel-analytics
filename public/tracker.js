@@ -148,7 +148,9 @@
     var text = isField
       ? (el.labels && el.labels[0] && el.labels[0].innerText) || el.getAttribute('aria-label') || el.placeholder || el.name || ''
       : el.getAttribute('aria-label') || el.innerText || el.value || el.alt || '';
-    text = text.trim().replace(/\s+/g, ' ').slice(0, 40);
+    text = text.trim().replace(/\s+/g, ' ');
+    if (text.length > 80) return label; // a container (e.g. div#root): its text is the whole page, not a label
+    text = text.slice(0, 40);
     return text ? label + ' "' + text + '"' : label;
   }
 
