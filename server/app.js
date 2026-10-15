@@ -31,6 +31,10 @@ const events = async () => (await connect()).collection('events');
 const str = (v, max) => typeof v === 'string' && v.length > 0 && v.length <= max;
 const num = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v < 1e6;
 
+// Heatmaps group by page: drop query/hash, and treat /x/index.html = /x/ and /x.html = /x
+// (hosts with "pretty URLs" serve the same page under both).
+export const pageKey = (url) => url.origin + url.pathname.replace(/\/index\.html?$/, '/').replace(/\.html?$/, '');
+
 // Returns a document ready to insert, or null if the event is malformed.
 export function parseEvent(e) {
   if (!e || typeof e !== 'object') return null;
@@ -48,7 +52,7 @@ export function parseEvent(e) {
     session_id: e.session_id,
     type: e.type,
     url: e.url,
-    page: url.origin + url.pathname, // query/hash stripped so heatmaps group by page
+    page: pageKey(url),
     ts,
     received_at: new Date(),
   };

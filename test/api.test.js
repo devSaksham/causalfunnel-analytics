@@ -1,7 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { app, connect } from '../server/app.js';
+import { app, connect, pageKey } from '../server/app.js';
 
 let mongo, server, base;
 before(async () => {
@@ -40,6 +40,14 @@ test('ingest, sessions, journey, pages, heatmap', async () => {
   const heat = await get('/heatmap?page=' + encodeURIComponent('https://shop.test/p'));
   assert.equal(heat.length, 2);
   assert.ok(heat.every((c) => c.page_width === 1200));
+});
+
+test('page key ignores query, hash and .html variants', () => {
+  const key = (u) => pageKey(new URL(u));
+  assert.equal(key('https://a.test/shop/index.html?x=1#y'), 'https://a.test/shop/');
+  assert.equal(key('https://a.test/shop/'), 'https://a.test/shop/');
+  assert.equal(key('https://a.test/p.html'), 'https://a.test/p');
+  assert.equal(key('https://a.test/p'), 'https://a.test/p');
 });
 
 test('rejects malformed events', async () => {

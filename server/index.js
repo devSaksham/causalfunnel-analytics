@@ -9,7 +9,7 @@ if (!uri) {
 }
 await connect(uri);
 
-app.use(express.static('dist')); // built dashboard + tracker + demo pages
+app.use(express.static('dist', { extensions: ['html'] })); // built dashboard + tracker + demo pages; /demo/product works like on Netlify
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`http://localhost:${port}`));
