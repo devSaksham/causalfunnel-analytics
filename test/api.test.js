@@ -42,6 +42,20 @@ test('ingest, sessions, journey, pages, heatmap', async () => {
   assert.ok(heat.every((c) => c.page_width === 1200));
 });
 
+test('snapshots: latest wins per page, validated', async () => {
+  const snap = (body) => fetch(`${base}/snapshots`, { method: 'POST', headers: { 'content-type': 'text/plain' }, body: JSON.stringify(body) });
+  const page = 'https://shop.test/p';
+  assert.equal((await snap({ url: page + '.html?x=1', html: '<p>old</p>', width: 1280, height: 900 })).status, 204);
+  assert.equal((await snap({ url: page, html: '<p>new</p>', width: 1440, height: 1000 })).status, 204);
+  const got = await get('/snapshot?page=' + encodeURIComponent(page));
+  assert.equal(got.html, '<p>new</p>');
+  assert.equal(got.width, 1440);
+  assert.equal((await fetch(`${base}/snapshot?page=${encodeURIComponent('https://shop.test/none')}`)).status, 404);
+  assert.equal((await snap({ url: 'nope', html: '<p/>', width: 1, height: 1 })).status, 400);
+  assert.equal((await snap({ url: page, html: '', width: 1, height: 1 })).status, 400);
+  assert.equal((await snap({ url: page, html: '<p/>', width: 0, height: 1 })).status, 400);
+});
+
 test('page key ignores query, hash and .html variants', () => {
   const key = (u) => pageKey(new URL(u));
   assert.equal(key('https://a.test/shop/index.html?x=1#y'), 'https://a.test/shop/');

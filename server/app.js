@@ -27,6 +27,7 @@ export function connect(uri = process.env.MONGODB_URI) {
   return dbPromise;
 }
 const events = async () => (await connect()).collection('events');
+const snapshots = async () => (await connect()).collection('snapshots');
 
 const str = (v, max) => typeof v === 'string' && v.length > 0 && v.length <= max;
 const num = (v) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v < 1e6;
@@ -139,6 +140,36 @@ api.get('/heatmap', async (req, res) => {
     .limit(10000)
     .toArray();
   res.json(clicks);
+});
+
+// Page snapshots: the tracker posts sanitized HTML so heatmaps can be drawn over pages that forbid framing.
+// One document per page (latest wins). The dashboard renders it in a sandbox with scripts disabled.
+// ponytail: unauthenticated like /events, so anyone can overwrite a page's snapshot; sign tracker requests if that matters
+const MAX_SNAPSHOT = 2_000_000;
+api.post('/snapshots', cors(), express.json({ type: '*/*', limit: '3mb' }), async (req, res) => {
+  const { url, html, width, height } = req.body || {};
+  let page;
+  try {
+    page = pageKey(new URL(url));
+  } catch {
+    return res.status(400).json({ error: 'invalid url' });
+  }
+  if (!str(html, MAX_SNAPSHOT) || !num(width) || !num(height) || width === 0) return res.status(400).json({ error: 'invalid snapshot' });
+  await (await snapshots()).updateOne(
+    { _id: page },
+    { $set: { html, width: Math.round(width), height: Math.round(height), captured_at: new Date() } },
+    { upsert: true }
+  );
+  res.status(204).end();
+});
+api.options('/snapshots', cors());
+
+api.get('/snapshot', async (req, res) => {
+  const page = req.query.page;
+  if (!str(page, 2048)) return res.status(400).json({ error: 'page query param required' });
+  const doc = await (await snapshots()).findOne({ _id: page });
+  if (!doc) return res.status(404).json({ error: 'no snapshot for this page yet' });
+  res.json({ page, html: doc.html, width: doc.width, height: doc.height, captured_at: doc.captured_at });
 });
 
 app.use('/api', api);

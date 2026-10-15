@@ -52,6 +52,8 @@ Atlas *Network Access* must allow `0.0.0.0/0`, because Netlify functions have no
 Events are posted to `/api/events` on the host serving the script. Override this with `data-endpoint="https://.../api/events"`.
 
 - **Single-page apps:** client-side route changes (`history.pushState`/`replaceState`/back) are recorded as page views when the path changes. Query-string-only changes are ignored, so search boxes do not spam views.
+- **Scope:** `data-hosts="example.com,www.example.com"` tracks only on those hostnames (skipping staging and preview URLs), and `data-pages="/,/pricing,/blog/*"` tracks only those paths (a trailing `*` matches a prefix). Pages outside the scope send nothing: no page views, clicks or snapshots.
+- **Page snapshots:** once per page per browser per day, the tracker sends a sanitized copy of the rendered HTML. Scripts, iframes, form values and `data-cf-ignore` zones are stripped, and a `<base>` tag points CSS and images back at the site. The dashboard draws the heatmap over this copy, the way Hotjar and Clarity do, so it works for any site, including ones that forbid framing and single-page apps. Pages with `data-cf-ignore` on `<html>` are never snapshotted.
 - **URLs:** the `#hash` is never sent, because OAuth implicit flows put access tokens there. Add `data-strip-query` to the script tag to drop `?query` strings too. Use it on sites whose URLs can carry auth codes or personal search terms.
 - **Opt-out zones:** clicks inside any element marked `data-cf-ignore` are not tracked. Putting the attribute on `<html>` (for example, while a user is signed in) pauses click tracking for the whole page, including modals rendered in portals.
 - **Observing events:** every event sent is also dispatched on `window` as a `cf:event` CustomEvent, which is handy for debug panels.
@@ -79,6 +81,8 @@ Page layout lives in static HTML, because the heatmap preview renders pages with
 | `GET` | `/api/sessions/:id/events` | All events of a session in time order (the user journey) |
 | `GET` | `/api/pages` | Tracked pages with view/click counts (feeds the heatmap page picker) |
 | `GET` | `/api/heatmap?page=<url>` | Click points (`x`, `y`, `page_width`) for a page |
+| `POST` | `/api/snapshots` | Store a page's sanitized HTML snapshot (`url`, `html` up to 2 MB, `width`, `height`). The latest one per page wins |
+| `GET` | `/api/snapshot?page=<url>` | Latest snapshot for a page (404 if none yet) |
 
 Event payload:
 
@@ -109,7 +113,8 @@ Sessions are computed with an aggregation rather than stored separately. This ke
 - **Session definition:** the session ID lives in `localStorage` and rotates after 30 minutes of inactivity, which is the common analytics convention. Sessions therefore persist across tabs and reloads. If localStorage is blocked, the session is kept in memory for the page's lifetime.
 - **Transport:** the tracker uses `navigator.sendBeacon` with a `text/plain` body. Plain-text posts need no CORS preflight, and beacons survive the page unloading, so a click on a link is still recorded. If beacons are unavailable, it falls back to `fetch(..., { keepalive: true })`. The ingest endpoint allows any origin, while the read endpoints are same-origin only.
 - **Heatmap accuracy:** clicks are stored as document coordinates (`pageX`/`pageY`) together with the document width. Responsive pages lay out differently per device, so the dashboard splits clicks into desktop (≥1024px), tablet and mobile views. It renders the page in an iframe at the median width for that class and scales `x` proportionally. This is exact for clicks at that width and approximate for nearby widths. Element-relative coordinates (selector + offset) would be more robust and are the next step.
-- **Page preview:** the iframe is sandboxed without scripts, so previewing a page doesn't fire its own tracker. Pages on other origins, or pages that forbid framing, still show their dots on a plain grid.
+- **Page preview:** the heatmap is drawn over the page's latest snapshot. Without one, the dashboard falls back to a live frame for its own pages and to a plain grid for other sites. Either way the frame is sandboxed without scripts, so nothing in it runs. Snapshots reflow to the width being viewed. Fonts served without CORS headers may fall back to a system font, and only the latest snapshot is kept, so a redesigned page shows old clicks over the new layout.
+- **Snapshot ingest is unauthenticated,** like events: anyone can overwrite a page's snapshot. Signed tracker requests or a per-site key would close that.
 - **Pages are grouped by origin + path.** Query strings and hashes are ignored, so `?utm=...` variants merge into one page. `/x/index.html` counts as `/x/`, and `/x.html` as `/x`, because hosts with "pretty URLs" (like Netlify) serve the same page under both. The full URL is still stored on each event.
 - **Validation:** the event type must be on an allow-list, URL and timestamp are checked, click coordinates must be finite numbers, string lengths and batch size are capped, and the body is limited to 32 KB. Invalid events get a 400 and nothing in that batch is stored.
 - **Not built (out of scope):**

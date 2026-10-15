@@ -298,12 +298,16 @@ function Heatmap({ reload }) {
   const counts = Object.fromEntries(DEVICES.map(([d]) => [d, all.filter((c) => deviceOf(c.page_width) === d).length]));
   const device = counts[pickedDevice] ? pickedDevice : DEVICES.map(([d]) => d).find((d) => counts[d] === Math.max(...Object.values(counts)));
   const points = all.filter((c) => deviceOf(c.page_width) === device);
-  // Render the page at the typical width for this device class and map each click onto it.
-  const W = points.length ? median(points.map((c) => c.page_width)) : 1280;
-  // Only our own pages can be previewed: other sites usually forbid framing (X-Frame-Options) and show a broken frame.
+  const snap = useApi(current && `/snapshot?page=${encodeURIComponent(current)}`, reload);
+  const snapSettled = !snap.loading && (snap.data || snap.error);
+  // Background, best first: the tracker's HTML snapshot (works for any site), then a live frame of our own
+  // pages, else a plain grid. Other sites usually forbid framing (X-Frame-Options), so we never frame them live.
   const sameOrigin = !!current && new URL(current).origin === location.origin;
-  const H = Math.max((sameOrigin && frameHeight) || 0, ...points.map((c) => c.y + 40), sameOrigin ? 600 : 360);
-  const showBox = !!current && !!clicks.data && (sameOrigin || points.length > 0);
+  const preview = !snapSettled ? null : snap.data ? 'snapshot' : sameOrigin ? 'live' : null;
+  // Render the page at the typical width for this device class and map each click onto it.
+  const W = points.length ? median(points.map((c) => c.page_width)) : snap.data?.width || 1280;
+  const H = Math.max((preview && frameHeight) || 0, ...points.map((c) => c.y + 40), preview ? 600 : 360);
+  const showBox = !!current && !!clicks.data && !!snapSettled && (!!preview || points.length > 0);
   const scale = boxWidth ? Math.min(1, boxWidth / W) : 1;
   const maxClicks = Math.max(1, ...(pages.data || []).map((p) => p.clicks));
 
@@ -348,22 +352,26 @@ function Heatmap({ reload }) {
         {clicks.data && (
           <div className="card-sub">
             <span className="mono">{current && shortPath(current)}</span>
-            <span>{points.length} clicks · {sameOrigin ? `rendered at ${W}px` : `${W}px wide`}</span>
+            <span>
+              {points.length} clicks · {preview ? `rendered at ${W}px` : `${W}px wide`}
+              {preview === 'snapshot' && ` · snapshot ${fmtTime(snap.data.captured_at)}`}
+            </span>
           </div>
         )}
-        {clicks.data && !sameOrigin && (
+        {clicks.data && snapSettled && !preview && (
           <p className="note">
-            {points.length
-              ? 'This page is on another site, which can’t be embedded here, so clicks are drawn on a grid at their recorded positions.'
-              : 'No clicks recorded on this page yet.'}{' '}
+            {points.length ? 'No snapshot of this page yet, so clicks are drawn on a grid.' : 'No clicks or snapshot for this page yet.'} The tracker sends a
+            snapshot on the next visit.{' '}
             <a href={current} target="_blank" rel="noreferrer">Open page ↗</a>
           </p>
         )}
         <div ref={boxRef} className="heat-box" style={{ height: showBox ? H * scale : 0 }}>
           {showBox && (
             <div className="stage" style={{ width: W, height: H, transform: `scale(${scale})` }}>
-              {/* No allow-scripts: the page renders, but its tracker cannot fire and pollute the data. */}
-              {sameOrigin && <iframe key={current} title="Page preview" src={current} sandbox="allow-same-origin" width={W} height={H} onLoad={measure} />}
+              {/* No allow-scripts: the page renders but nothing in it runs (its tracker can't fire, snapshot HTML can't act).
+                  allow-same-origin only lets us measure the page height. */}
+              {preview === 'snapshot' && <iframe key={'s' + current} title="Page snapshot" srcDoc={snap.data.html} sandbox="allow-same-origin" referrerPolicy="no-referrer" width={W} height={H} onLoad={measure} />}
+              {preview === 'live' && <iframe key={'l' + current} title="Page preview" src={current} sandbox="allow-same-origin" width={W} height={H} onLoad={measure} />}
               {points.map((c, i) => (
                 <span key={i} className="dot" style={{ left: (c.x * W) / c.page_width, top: c.y }} />
               ))}
