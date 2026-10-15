@@ -10,7 +10,8 @@ let dbPromise;
 export function connect(uri = process.env.MONGODB_URI) {
   if (dbPromise) return dbPromise;
   if (!uri) throw new Error('MONGODB_URI is not set');
-  dbPromise = MongoClient.connect(uri)
+  // Fail fast: a serverless function would otherwise hang until the gateway times out.
+  dbPromise = MongoClient.connect(uri, { serverSelectionTimeoutMS: 8000 })
     .then(async (client) => {
       const db = client.db(process.env.MONGODB_DB || 'analytics');
       await db.collection('events').createIndexes([
