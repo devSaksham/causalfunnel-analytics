@@ -52,7 +52,8 @@ Atlas *Network Access* must allow `0.0.0.0/0`, because Netlify functions have no
 Events are posted to `/api/events` on the host serving the script. Override this with `data-endpoint="https://.../api/events"`.
 
 - **Single-page apps:** client-side route changes (`history.pushState`/`replaceState`/back) are recorded as page views when the path changes. Query-string-only changes are ignored, so search boxes do not spam views.
-- **Opt-out zones:** clicks inside any element marked `data-cf-ignore` are not tracked.
+- **URLs:** the `#hash` is never sent, because OAuth implicit flows put access tokens there. Add `data-strip-query` to the script tag to drop `?query` strings too. Use it on sites whose URLs can carry auth codes or personal search terms.
+- **Opt-out zones:** clicks inside any element marked `data-cf-ignore` are not tracked. Putting the attribute on `<html>` (for example, while a user is signed in) pauses click tracking for the whole page, including modals rendered in portals.
 - **Observing events:** every event sent is also dispatched on `window` as a `cf:event` CustomEvent, which is handy for debug panels.
 - **Privacy:** a clicked element is described by its tag, id and visible text. Form fields are described by their label or placeholder only, never by what the user typed.
 
