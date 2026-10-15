@@ -6,5 +6,6 @@ export default defineConfig({
   root: 'dashboard',
   publicDir: '../public', // tracker.js + demo pages ship alongside the dashboard
   build: { outDir: '../dist', emptyOutDir: true },
-  server: { proxy: { '/api': 'http://localhost:3000' } },
+  // API_PROXY=https://<deployed-site> npm run dev:dashboard develops the UI against live data
+  server: { proxy: { '/api': { target: process.env.API_PROXY || 'http://localhost:3000', changeOrigin: true } } },
 });
