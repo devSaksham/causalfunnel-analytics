@@ -143,6 +143,8 @@ tr td:last-child { border-radius: 0 10px 10px 0; }
 .segmented button.active { background: var(--card); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / 0.08); }
 .segmented button:disabled { opacity: 0.45; cursor: default; }
 .count { font-variant-numeric: tabular-nums; color: var(--muted); margin-left: 2px; }
+.note { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: var(--canvas); color: var(--muted); font-size: 13px; }
+.note a { color: var(--accent-ink); font-weight: 600; text-decoration: none; white-space: nowrap; }
 .heat-box { position: relative; overflow: hidden; border-radius: 14px; background-color: var(--canvas);
   background-image: radial-gradient(var(--track) 1px, transparent 1px); background-size: 16px 16px; }
 .stage { position: absolute; top: 0; left: 0; transform-origin: 0 0; }

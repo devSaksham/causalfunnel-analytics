@@ -292,6 +292,7 @@ function Heatmap({ reload }) {
   const boxWidth = useWidth(boxRef);
   const [frameHeight, setFrameHeight] = useState(null);
   const [pickedDevice, setDevice] = useState(null);
+  useEffect(() => setFrameHeight(null), [current]); // a new page re-measures
 
   const all = clicks.data || [];
   const counts = Object.fromEntries(DEVICES.map(([d]) => [d, all.filter((c) => deviceOf(c.page_width) === d).length]));
@@ -299,7 +300,10 @@ function Heatmap({ reload }) {
   const points = all.filter((c) => deviceOf(c.page_width) === device);
   // Render the page at the typical width for this device class and map each click onto it.
   const W = points.length ? median(points.map((c) => c.page_width)) : 1280;
-  const H = Math.max(frameHeight || 0, ...points.map((c) => c.y + 40), 600);
+  // Only our own pages can be previewed: other sites usually forbid framing (X-Frame-Options) and show a broken frame.
+  const sameOrigin = !!current && new URL(current).origin === location.origin;
+  const H = Math.max((sameOrigin && frameHeight) || 0, ...points.map((c) => c.y + 40), sameOrigin ? 600 : 360);
+  const showBox = !!current && !!clicks.data && (sameOrigin || points.length > 0);
   const scale = boxWidth ? Math.min(1, boxWidth / W) : 1;
   const maxClicks = Math.max(1, ...(pages.data || []).map((p) => p.clicks));
 
@@ -344,14 +348,22 @@ function Heatmap({ reload }) {
         {clicks.data && (
           <div className="card-sub">
             <span className="mono">{current && shortPath(current)}</span>
-            <span>{points.length} clicks · rendered at {W}px</span>
+            <span>{points.length} clicks · {sameOrigin ? `rendered at ${W}px` : `${W}px wide`}</span>
           </div>
         )}
-        <div ref={boxRef} className="heat-box" style={{ height: current ? H * scale : 0 }}>
-          {current && (
+        {clicks.data && !sameOrigin && (
+          <p className="note">
+            {points.length
+              ? 'This page is on another site, which can’t be embedded here, so clicks are drawn on a grid at their recorded positions.'
+              : 'No clicks recorded on this page yet.'}{' '}
+            <a href={current} target="_blank" rel="noreferrer">Open page ↗</a>
+          </p>
+        )}
+        <div ref={boxRef} className="heat-box" style={{ height: showBox ? H * scale : 0 }}>
+          {showBox && (
             <div className="stage" style={{ width: W, height: H, transform: `scale(${scale})` }}>
               {/* No allow-scripts: the page renders, but its tracker cannot fire and pollute the data. */}
-              <iframe key={current} title="Page preview" src={current} sandbox="allow-same-origin" width={W} height={H} onLoad={measure} />
+              {sameOrigin && <iframe key={current} title="Page preview" src={current} sandbox="allow-same-origin" width={W} height={H} onLoad={measure} />}
               {points.map((c, i) => (
                 <span key={i} className="dot" style={{ left: (c.x * W) / c.page_width, top: c.y }} />
               ))}
