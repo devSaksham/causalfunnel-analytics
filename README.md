@@ -2,8 +2,8 @@
 
 A small full-stack analytics app. An embeddable script records page views and clicks, an Express API stores them in MongoDB, and a React dashboard shows each session's journey and a per-page click heatmap.
 
-- **Live dashboard:** _LIVE_URL_
-- **Demo store (tracked):** _LIVE_URL_/demo/index.html
+- **Live dashboard:** https://causalfunnel-analytics.netlify.app
+- **Demo store (tracked):** https://causalfunnel-analytics.netlify.app/demo/index.html
 
 ## Tech stack
 
